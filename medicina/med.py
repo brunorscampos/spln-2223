@@ -18,22 +18,22 @@ class Entrada:
         print(self.name)
         if hasattr(self,'es'):
             print(self.es,end="")
-        elif hasattr(self,'en'):
+        if hasattr(self,'en'):
             print(self.en,end="")
-        elif hasattr(self,'pt'):
+        if hasattr(self,'pt'):
             print(self.pt,end="")
-        elif hasattr(self,'la'):
+        if hasattr(self,'la'):
             print(self.la,end="")
     
     def to_string(self):
         r = self.name
         if hasattr(self,'es'):
             r+=self.es
-        elif hasattr(self,'en'):
+        if hasattr(self,'en'):
             r+=self.en
-        elif hasattr(self,'pt'):
+        if hasattr(self,'pt'):
             r+=self.pt
-        elif hasattr(self,'la'):
+        if hasattr(self,'la'):
             r+=self.la
         return r
         
