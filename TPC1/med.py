@@ -40,4 +40,4 @@ for entry in entries:
 print(len(vocab_med))
 
 with open("medicina.json", "w") as f:
-    json.dump(vocab_med,f)
+    json.dump(vocab_med,f,indent=4)
