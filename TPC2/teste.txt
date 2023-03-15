@@ -1,12 +1,17 @@
-ID: VAL
-pt:
--VAL
-+ID: VAL
-en:
--VAL
-+ID: VAL
--VAL
-es:
--VAL
--VAL
-+ID: VAL
+1.
+termo: à;
+areas: Anatomia;
+genero: f;
+pt: asa;
+en: wing;
+es: ala;
+la: ala;
+
+559.
+termo: autoenxerto;
+genero: m;
+areas: Terap\u00e9utica;
+pt: auto-enxerto;
+en: autograft;
+es: autoinjerto;
+nota: Designa un \u2018enxerto tomado do corpo    do mesmo doente\u2019. Cfr. con \u201cautotransplante\u201d.;

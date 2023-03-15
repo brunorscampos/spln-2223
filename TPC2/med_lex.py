@@ -28,36 +28,36 @@ AT_T : '\n' '+' ID ':' VAL
 """
 import ply.lex as lex
 
-literals = "+\n:-"
-tokens = ['ID','ID_LING','VAL','LINHA_B','WS']
+literals = "+:-\n;"
+tokens = ['ID','ID_LING','VAL','LINHA_B','INDICE']
+t_ignore  = ' \t'
 
 def t_ID(t): 
     r'\w+(?=\ *:)'
-    if t.value in ['en','es','pt','la']:
+    if t.value in ['en','es','pt','la','ga']:
         t.type = 'ID_LING'
-    print()
+    return t
+
+def t_INDICE(t):
+    r'\d+\.'
     return t
 
 def t_VAL(t): 
-    r'\w[^\n+:-]+'
+    r'\w[^\n+:-;]*'
     return t
 
 def t_LINHA_B(t): 
     r'\n{2}'
     return t
 
-def t_WS(t):
-    r'\ '
-    pass
-
 def t_error(t):
     print(f"Illegal character {t.value[0]} at line {t.lexer.lineno}")
     t.lexer.skip(1)
 
 lexer = lex.lex()
-with open('teste.txt','r') as f:
-    conteudo = f.read()
-    lexer.input(conteudo)
+#with open('teste.txt','r') as f:
+#    conteudo = f.read()
+#    lexer.input(conteudo)
 
-for tok in lexer:
-    print(tok)
+#for tok in lexer:
+#    print(tok)

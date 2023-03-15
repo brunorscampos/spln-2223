@@ -97,5 +97,5 @@ for entrada in entries:
             'vids' : vids,
         }
 
-with open("medicina_para_TPC2.json", "w") as f:
+with open("medicina_para_TPC2.json", "w",encoding="utf-8") as f:
     json.dump(vocab_med,f,indent=4)
