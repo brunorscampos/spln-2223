@@ -1,6 +1,6 @@
-"""This module does blah blah."""
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python3 
+"""Module to tokenize books."""
 
 # 0. Quebras de pagina                        OK
 # 1. Separar pontuação das palavras           OK
