@@ -1,3 +1,4 @@
+"""This module does blah blah."""
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python3 
 
@@ -9,6 +10,8 @@
 # 3. Separar paragrafos de linhas pequenas.   ??
 # 4. Juntar linhas da mesma frase.            OK
 # 5. Uma frase por linha                      OK?
+
+__version__ = "0.3"
 
 import fileinput
 import re
