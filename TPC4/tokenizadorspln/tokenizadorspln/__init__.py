@@ -55,7 +55,7 @@ def process_text(text):
     text = re.sub(regex_par,"\g<1>\n\n\g<2>",text)
     text = re.sub(regex_pont,"\g<1> \g<2>",text)
     text = re.sub(regex_nl3,"\g<1> \g<2>",text)
-    text = re.sub(regex_line," \g<1>\n\n\g<2>",text)    
+    text = re.sub(regex_line," \g<1>\n\g<2>",text)    
     text = re.sub(regex_poema,guarda_poema,text,flags=re.S)
     text = re.sub(regex_carta,guarda_carta,text,flags=re.S)
     return text
@@ -96,11 +96,11 @@ def process_arguments(__version__):
 def tokenizer():
     args = process_arguments(__version__)
     text = ""
-    if not args.input:
+    if not args.input_file:
         for line in sys.stdin:
             text+=line
     else:
-        input = args.input
+        input = args.input_file
         text = input.read()
     
     chapter_delims = get_conf(args,'/conf/cap.txt')
