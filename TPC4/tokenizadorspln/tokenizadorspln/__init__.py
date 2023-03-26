@@ -13,7 +13,6 @@
 
 __version__ = "0.4"
 
-import fileinput
 import re
 import os
 import sys
@@ -77,7 +76,7 @@ def get_conf(args,file_path):
             break
     return abrev_dic
 
-def process_arguments(__version__):
+def get_arguments(__version__):
     parser = argparse.ArgumentParser(
         prog='tok',
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -94,7 +93,7 @@ def process_arguments(__version__):
     return parser.parse_args()
 
 def tokenizer():
-    args = process_arguments(__version__)
+    args = get_arguments(__version__)
     text = ""
     if not args.input_file:
         for line in sys.stdin:
