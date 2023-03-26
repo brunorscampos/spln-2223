@@ -11,7 +11,7 @@
 # 4. Juntar linhas da mesma frase.            OK
 # 5. Uma frase por linha                      OK?
 
-__version__ = "0.3"
+__version__ = "0.4"
 
 import fileinput
 import re
