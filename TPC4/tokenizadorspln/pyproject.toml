@@ -11,5 +11,5 @@ dynamic = ["version", "description"]
 dependencies = ["spacy"]
 readme = "README.md"
 
-[projects.scripts]
+[project.scripts]
 tok = "tokenizadorspln:tokenizer"

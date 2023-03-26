@@ -1,0 +1,8 @@
+#pt
+CAPÍTULO
+Capítulo
+capítulo
+#en
+CHAPTER
+Chapter
+chapter
