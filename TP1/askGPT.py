@@ -164,6 +164,7 @@ def handle_find(c):
     """
     Usage: find
     Search for documents in the current MongoDB collection that match the given terms.
+    If no terms are given, returns all documents in current MongoDB collection.
     """
     if len(c):
         print("Usage: find")
