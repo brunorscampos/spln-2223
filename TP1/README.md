@@ -7,6 +7,9 @@ Os módulos escolhidos para este TP foram:
 - pymongo
 - requests
 
+Como este programa faz pedidos à API da OpenAI, é necessário uma chave API. 
+Esta pode ser obtida em [OpenAI API](https://platform.openai.com/).
+
 Available commands:
 
     exit    - Quit program
@@ -18,4 +21,4 @@ Available commands:
     use     - Change current MongoDB collection
     help    - Show this help message
 
-Type 'help <command>' for more information on a specific command.
+Type 'help \<command\>' for more information on a specific command.
