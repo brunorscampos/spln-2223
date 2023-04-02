@@ -6,7 +6,6 @@ import requests
 import datetime
 from PIL import Image
 from io import BytesIO
-
 # Init variables
 config = {}
 client = pymongo.MongoClient("mongodb://localhost:27017/")
@@ -54,22 +53,42 @@ def ask_chatgpt(question):
     start_index = answer.find('"content":"') + len('"content":"')
     end_index = answer.find('"}', start_index)
     answer = answer[start_index:end_index]
+    if response.status_code == 200:
+        collection.insert_one({"type":"chat",
+                               "prompt": question, 
+                               "answer": answer,
+                               "date": datetime.datetime.now().strftime("%Y-%m-%d")
+                               })
     return answer
 
 # Generate ChatGPT image
 def generate_image(question,filename):
-    response = requests.post("https://api.openai.com/v1/images/generations", headers=headers, json={"model": "image-alpha-001", "prompt": question})
-    image_data = response.json()["data"][0]["url"]
-    response = requests.get(image_data)
-    image = Image.open(BytesIO(response.content))
-    image.save("imgs/"+filename)
-    print("Saved image at:","imgs/"+filename)
+    global headers
+    response = requests.post("https://api.openai.com/v1/images/generations", 
+                             headers=headers, 
+                             json={
+                                 "model": "image-alpha-001", 
+                                 "prompt": question
+                                 })
+    if response.status_code == 200:
+        image_data = response.json()["data"][0]["url"]
+        response = requests.get(image_data)
+        image = Image.open(BytesIO(response.content))
+        image.save("imgs/"+filename)
+        print("Saved image at:","imgs/"+filename)
+        collection.insert_one({"type":"image",
+                               "prompt": question, 
+                               "answer": image_data,
+                               "date": datetime.datetime.now().strftime("%Y-%m-%d")
+                               })
+    else:
+        print(response.content)
 
-# find MongoDB documents that include the terms in the question or answer.
+# Find MongoDB documents that include the terms in the question or answer.
 def find_entries(terms):
     query = {
         "$or": 
-            [{"question": {"$regex": term, "$options": "i"}} for term in terms]
+            [{"prompt": {"$regex": term, "$options": "i"}} for term in terms]
             +
             [{"answer": {"$regex": term, "$options": "i"}} for term in terms]
     }
@@ -78,55 +97,170 @@ def find_entries(terms):
     if num_matches > 0:
         print(f"\nSearch concluded with {num_matches} " + ("matches" if num_matches != 1 else "match") + " found!")
         for result in results:
-            print("\nQuestion:",result['question'])
+            print("\nType:",result['type'])
+            print("Prompt:",result['prompt'])
             print("Answer:",result['answer'])
             print("Date:",result['date'],"\n")
     else:
         print("\nNo matches found!\n")
 
-# Functionalities of program
-def askGPT(commands):
-    global db,collection
-    if len(commands) == 1:
-        if commands[0] == "exit":
-            client.close()
-            return False
-        elif commands[0] == "ask":
-            input = get_input("Question> ")
-            answer = ask_chatgpt(input)
-            collection.insert_one({"question": input, "answer": answer,"date": datetime.datetime.now().strftime("%Y-%m-%d")})
-            print(answer)
-        elif commands[0] == "context":
-            config["context"] = get_input("Context> ")
-        elif commands[0] == "find":
-            terms = get_input("What terms should I search for?\nTerms> ").split()
-            find_entries(terms)
-        else:
-            print("ERROR: Invalid command!")
-    elif len(commands) == 2:
-        if commands[0] == "image":
-            input = get_input("Prompt> ")
-            generate_image(input,commands[1])
-        elif commands[0] == "delete":
-            if commands[1] in ["all","one","many"]:
-                pass
-        elif commands[0] == "use":
-            config["mongocollection"] = commands[1]
-            collection = db[config["mongocollection"]]
-            save_config()
-        else:
-            print("ERROR: Invalid command!")
+# Delete MongoDB documents that include the term in the question or answer.
+def delete_entries(term,mode):
+    query = {"$or": [
+        {"prompt": {"$regex": term, "$options": "i"}},
+        {"answer": {"$regex": term, "$options": "i"}}
+    ]}
+    if mode == "one":
+        result = collection.delete_one(query)
     else:
-        print("ERROR: Invalid command!")
-    return True
+        result = collection.delete_many(query)
+    print(f"Deleted {result.deleted_count} documents!")
+        
+
+def handle_exit(c):
+    """
+    Usage: exit
+    Exit the program and close the MongoDB client.
+    """
+    if len(c):
+        print("Usage: exit")
+    else:
+        client.close()
+        return True
+
+def handle_ask(c):
+    """
+    Usage: ask
+    Prompts ChatGPT, and prints the answer.
+    Also creates a document in current MongoDB collection with type, prompt, answer and date fields.
+    """
+    if len(c):
+        print("Usage: ask")
+    else:
+        input = get_input("Question> ")
+        answer = ask_chatgpt(input)
+        print(answer)
+
+def handle_context(c):
+    """
+    Usage: context
+    Set the context for ChatGPT to use in generating answers.
+    """
+    if len(c):
+        print("Usage: context")
+    else:
+        config["context"] = get_input("Context> ")
+        save_config()
+
+def handle_find(c):
+    """
+    Usage: find
+    Search for documents in the current MongoDB collection that match the given terms.
+    """
+    if len(c):
+        print("Usage: find")
+    else:
+        terms = get_input("What terms should I search for?\nTerms> ").split()
+        find_entries(terms)
+
+def handle_image(commands):
+    """
+    Usage: image <output_filename>
+    Generate an image based on the given prompt and save it to the given output file.
+    Also creates a document in current MongoDB collection with type, prompt, answer and date fields.
+    """
+    if len(commands) != 1:
+        print("Usage: image <output_filename>")
+    else:
+        input = get_input("Prompt> ")
+        generate_image(input,commands[0])
+
+def handle_delete(commands):
+    """
+    Usage: delete <one|many|all>
+    Delete one or many documents from the MongoDB collection that match the given term.
+    If "all" is provided as the argument, delete all documents in the collection.
+    """
+    if len(commands) != 1:
+        print("Usage: delete <one|many|all>")
+    else:
+        if commands[0] in ["one","many"]:
+            term = get_input("What term should I search for?\nTerm> ").split()
+            delete_entries(term,commands[0])
+        elif commands[0] == "all":
+            choice = get_input("Are you sure?[y/N]> ").split()
+            if choice == "y":
+                result = collection.delete_many({})
+                print(f"Deleted {result.deleted_count} documents!")
+            else:
+                print("Operation cancelled!")
+        else:
+            print("Invalid command. Usage: delete <one|many|all>")
+
+def handle_use(commands):
+    """
+    Usage: use <collection_name>
+    Set the current MongoDB collection to the given name.
+    """
+    if len(commands) != 1:
+        print("Usage: use <collection_name>")
+    else:
+        global db, collection
+        config["mongocollection"] = commands[0]
+        collection = db[config["mongocollection"]]
+        save_config()
+    
+def handle_help(commands):
+    """
+    Usage: help <command>
+    Display information about the given command.
+    """
+    if len(commands) == 1:
+        if commands[0] in command_handlers:
+            print(f"{command_handlers[commands[0]].__doc__}")
+        else:
+            print(f"Invalid command: {commands[0]}")
+    elif not len(commands):
+        print("Available commands:")
+        print("  exit    - Quit program")
+        print("  ask     - Ask question to ChatGPT")
+        print("  context - Set context for ChatGPT")
+        print("  find    - Find entries in current MongoDB collection")
+        print("  image   - Generate image based on a prompt")
+        print("  delete  - Delete one, many or all entries from current MongoDB collection")
+        print("  use     - Change current MongoDB collection")
+        print("  help    - Show this help message\n")
+        print("Type 'help <command>' for more information on a specific command.")
+    else:
+        print("Usage: help <command>")
+
+# ... more functions ...
+
+command_handlers = {
+    "exit": handle_exit,
+    "ask": handle_ask,
+    "context": handle_context,
+    "find": handle_find,
+    "image": handle_image,
+    "delete": handle_delete,
+    "use": handle_use,
+    "help": handle_help,
+    # ... more commands ...
+}
+
+def askGPT(commands):
+    if commands[0] in command_handlers:
+        return command_handlers[commands[0]](commands[1:])
+    print("ERROR: Invalid command!")
         
 def main():
-    flag = True
+    exit = False
     load_config()
-    while flag:
+    while not exit:
         input = get_input(f"askGPT-{config['mongocollection']}> ")
-        flag = askGPT(input.split())
+        exit = askGPT(input.split())
     save_config()
+    client.close()
 
 if __name__ == "__main__":
     main()
