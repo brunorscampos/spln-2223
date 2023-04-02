@@ -55,6 +55,7 @@ def ask_chatgpt(question):
     answer = answer[start_index:end_index]
     if response.status_code == 200:
         collection.insert_one({"type":"chat",
+                               "context": config["context"],
                                "prompt": question, 
                                "answer": answer,
                                "date": datetime.datetime.now().strftime("%Y-%m-%d")
@@ -86,21 +87,28 @@ def generate_image(question,filename):
 
 # Find MongoDB documents that include the terms in the question or answer.
 def find_entries(terms):
-    query = {
-        "$or": 
-            [{"prompt": {"$regex": term, "$options": "i"}} for term in terms]
-            +
-            [{"answer": {"$regex": term, "$options": "i"}} for term in terms]
-    }
-    results = collection.find(query,{"_id": 0})
+    if not len(terms):
+        results = collection.find({},{"_id": 0})
+    else:
+        query = {
+            "$or": 
+                [{"prompt": {"$regex": term, "$options": "i"}} for term in terms]
+                +
+                [{"answer": {"$regex": term, "$options": "i"}} for term in terms]
+        }
+        results = collection.find(query,{"_id": 0})
     num_matches = len(list(results.clone()))
     if num_matches > 0:
         print(f"\nSearch concluded with {num_matches} " + ("matches" if num_matches != 1 else "match") + " found!")
+        print("=" * 40)
         for result in results:
-            print("\nType:",result['type'])
-            print("Prompt:",result['prompt'])
-            print("Answer:",result['answer'])
-            print("Date:",result['date'],"\n")
+            print(f"Type: {result['type']}")
+            if result['type'] == "chat":
+                print(f"Context: {result['context']}")
+            print(f"Prompt: {result['prompt']}")
+            print(f"Answer: {result['answer']}")
+            print(f"Date: {result['date']}")
+            print("-" * 40)
     else:
         print("\nNo matches found!\n")
 
@@ -256,6 +264,9 @@ def askGPT(commands):
 def main():
     exit = False
     load_config()
+    if config["key"] == "OPENAI_API_KEY":
+        print("ERROR: OpenAI API key necessary!\nPlace it in the 'key' field inside the config file!")
+        return None
     while not exit:
         input = get_input(f"askGPT-{config['mongocollection']}> ")
         exit = askGPT(input.split())
