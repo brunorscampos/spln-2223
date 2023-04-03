@@ -133,8 +133,9 @@ def handle_exit(c):
     if len(c):
         print("Usage: exit")
     else:
+        save_config()
         client.close()
-        return True
+        sys.exit(0)
 
 def handle_ask(c):
     """
@@ -263,16 +264,13 @@ def askGPT(commands):
     print("ERROR: Invalid command!")
         
 def main():
-    exit = False
     load_config()
     if config["key"] == "OPENAI_API_KEY":
         print("ERROR: OpenAI API key necessary!\nPlace it in the 'key' field inside the config file!")
-        return None
-    while not exit:
+        sys.exit(1)
+    while True:
         input = get_input(f"askGPT-{config['mongocollection']}> ")
-        exit = askGPT(input.split())
-    save_config()
-    client.close()
+        askGPT(input.split())
 
 if __name__ == "__main__":
     main()
