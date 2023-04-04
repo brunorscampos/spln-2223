@@ -12,13 +12,13 @@ Esta pode ser obtida em [OpenAI API](https://platform.openai.com/).
 
 Available commands:
 
-    exit    - Quit program
     ask     - Ask question to ChatGPT
-    context - Set context for ChatGPT
-    find    - Find entries in current MongoDB collection
     image   - Generate image based on a prompt
+    find    - Find entries in current MongoDB collection
     delete  - Delete one, many or all entries from current MongoDB collection
+    context - Set context for ChatGPT
     use     - Change current MongoDB collection
     help    - Show this help message
+    exit    - Quit program
 
 Type 'help \<command\>' for more information on a specific command.

@@ -232,14 +232,14 @@ def handle_help(commands):
             print(f"Invalid command: {commands[0]}")
     elif not len(commands):
         print("Available commands:")
-        print("  exit    - Quit program")
         print("  ask     - Ask question to ChatGPT")
-        print("  context - Set context for ChatGPT")
-        print("  find    - Find entries in current MongoDB collection")
         print("  image   - Generate image based on a prompt")
+        print("  find    - Find entries in current MongoDB collection")
         print("  delete  - Delete one, many or all entries from current MongoDB collection")
+        print("  context - Set context for ChatGPT")
         print("  use     - Change current MongoDB collection")
-        print("  help    - Show this help message\n")
+        print("  help    - Show this help message")
+        print("  exit    - Quit program\n")
         print("Type 'help <command>' for more information on a specific command.")
     else:
         print("Usage: help <command>")
