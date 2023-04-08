@@ -86,21 +86,24 @@ def generate_image(question,filename):
         print(response.content)
 
 # Find MongoDB documents that include the terms in the question or answer.
-def find_entries(terms):
+def find_entries(terms,mode,fields):
     if not len(terms):
         results = collection.find({},{"_id": 0})
     else:
-        query = {
-            "$or": 
-                [{"prompt": {"$regex": term, "$options": "i"}} for term in terms]
-                +
-                [{"answer": {"$regex": term, "$options": "i"}} for term in terms]
-        }
+        search = []
+        for term in terms:
+            entry = []
+            for field in fields:
+                entry.append({field: {"$regex": term, "$options": "i"}})
+            search.append({"$or": entry})
+        query = { "$and": search }
         results = collection.find(query,{"_id": 0})
+        if mode == "one":
+            results = results.limit(1)
     num_matches = len(list(results.clone()))
     if num_matches > 0:
         print(f"\nSearch concluded with {num_matches} " + ("matches" if num_matches != 1 else "match") + " found!")
-        print("=" * 40)
+        print("=" * 80)
         for result in results:
             print(f"Type: {result['type']}")
             if result['type'] == "chat":
@@ -108,34 +111,24 @@ def find_entries(terms):
             print(f"Prompt: {result['prompt']}")
             print(f"Answer: {result['answer']}")
             print(f"Date: {result['date']}")
-            print("-" * 40)
+            print("-" * 80)
     else:
         print("\nNo matches found!\n")
 
 # Delete MongoDB documents that include the term in the question or answer.
-def delete_entries(term,mode):
-    query = {"$or": [
-        {"prompt": {"$regex": term, "$options": "i"}},
-        {"answer": {"$regex": term, "$options": "i"}}
-    ]}
+def delete_entries(terms,mode,fields):
+    search = []
+    for term in terms:
+        entry = []
+        for field in fields:
+            entry.append({field: {"$regex": term, "$options": "i"}})
+        search.append({"$or": entry})
+    query = { "$and": search }
     if mode == "one":
         result = collection.delete_one(query)
     else:
         result = collection.delete_many(query)
     print(f"Deleted {result.deleted_count} documents!")
-        
-
-def handle_exit(c):
-    """
-    Usage: exit
-    Exit the program and close the MongoDB client.
-    """
-    if len(c):
-        print("Usage: exit")
-    else:
-        save_config()
-        client.close()
-        sys.exit(0)
 
 def handle_ask(c):
     """
@@ -150,29 +143,6 @@ def handle_ask(c):
         answer = ask_chatgpt(input)
         print(answer)
 
-def handle_context(c):
-    """
-    Usage: context
-    Set the context for ChatGPT to use in generating answers.
-    """
-    if len(c):
-        print("Usage: context")
-    else:
-        config["context"] = get_input("Context> ")
-        save_config()
-
-def handle_find(c):
-    """
-    Usage: find
-    Search for documents in the current MongoDB collection that match the given terms.
-    If no terms are given, returns all documents in current MongoDB collection.
-    """
-    if len(c):
-        print("Usage: find")
-    else:
-        terms = get_input("What terms should I search for?\nTerms> ").split()
-        find_entries(terms)
-
 def handle_image(commands):
     """
     Usage: image <output_filename>
@@ -185,27 +155,70 @@ def handle_image(commands):
         input = get_input("Prompt> ")
         generate_image(input,commands[0])
 
+def handle_find(commands):
+    """
+    Usage: find [SEARCH_FIELD]  (Valid fields: 'type','context','prompt','answer','date')
+    Search for documents in the current MongoDB collection that match the given terms.
+    If no terms are given, returns all documents in current MongoDB collection.
+    """
+    fields = ["type","context","prompt","answer","date"]
+    if len(commands):
+        if all(item in fields for item in commands):
+            fields = commands
+        else:
+            print("Usage: find [SEARCH_FIELD]  (Valid fields: 'type','context','prompt','answer','date')")
+            return
+    terms = get_input("What terms should I search for?\nTerms> ").split()
+    find_entries(terms,"many",fields)
+
 def handle_delete(commands):
     """
-    Usage: delete <one|many|all>
-    Delete one or many documents from the MongoDB collection that match the given term.
+    Usage: delete <one|many|all> [SEARCH_FIELD]  (Valid fields: 'type','context','prompt','answer','date')
+    Delete one or many documents from the MongoDB collection that match the given terms.
     If "all" is provided as the argument, delete all documents in the collection.
     """
-    if len(commands) != 1:
-        print("Usage: delete <one|many|all>")
+    fields = ["type","context","prompt","answer","date"]
+    if len(commands) < 1:
+        print("Usage: delete <one|many|all> [SEARCH_FIELD]  (Valid fields: 'type','context','prompt','answer','date')")
     else:
         if commands[0] in ["one","many"]:
-            term = get_input("What term should I search for?\nTerm> ").split()
-            delete_entries(term,commands[0])
+            if not commands[1:]:
+                pass
+            elif all(item in fields for item in commands[1:]):
+                fields = commands
+            else:
+                print("Usage: delete <one|many|all> [SEARCH_FIELD]  (Valid fields: 'type','context','prompt','answer','date')")
+                return
+            terms = get_input("What terms should I search for?\nTerm> ").split()
+            if not len(terms):
+                print("Use 'delete all' to delete all documents!")
+                return
+            find_entries(terms,commands[0],fields)
+            choice = get_input("Are you sure?[y/N]> ")
+            if choice == "y":
+                delete_entries(terms,commands[0],fields)
+            else:
+                print("Operation cancelled!")
         elif commands[0] == "all":
-            choice = get_input("Are you sure?[y/N]> ").split()
+            choice = get_input("Are you sure?[y/N]> ")
             if choice == "y":
                 result = collection.delete_many({})
                 print(f"Deleted {result.deleted_count} documents!")
             else:
                 print("Operation cancelled!")
         else:
-            print("Invalid command. Usage: delete <one|many|all>")
+            print("Invalid command. Usage: delete <one|many|all> [SEARCH_FIELD]  (Valid fields: 'type','context','prompt','answer','date')")
+
+def handle_context(c):
+    """
+    Usage: context
+    Set the context for ChatGPT to use in generating answers.
+    """
+    if len(c):
+        print("Usage: context")
+    else:
+        config["context"] = get_input("Context> ")
+        save_config()
 
 def handle_use(commands):
     """
@@ -244,17 +257,29 @@ def handle_help(commands):
     else:
         print("Usage: help <command>")
 
+def handle_exit(c):
+    """
+    Usage: exit
+    Exit the program and close the MongoDB client.
+    """
+    if len(c):
+        print("Usage: exit")
+    else:
+        save_config()
+        client.close()
+        sys.exit(0)
+
 # ... more functions ...
 
 command_handlers = {
-    "exit": handle_exit,
     "ask": handle_ask,
-    "context": handle_context,
-    "find": handle_find,
     "image": handle_image,
+    "find": handle_find,
     "delete": handle_delete,
+    "context": handle_context,
     "use": handle_use,
     "help": handle_help,
+    "exit": handle_exit,
     # ... more commands ...
 }
 
