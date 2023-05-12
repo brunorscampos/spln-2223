@@ -10,8 +10,8 @@
 __version__ = "0.1"
 
 import argparse
-from get_links import get_links
-from get_tables import get_tables
+from .get_links import get_links
+from .get_tables import get_tables
 
 def get_arguments_links(__version__):
     parser = argparse.ArgumentParser(

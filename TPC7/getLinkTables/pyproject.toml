@@ -12,5 +12,5 @@ dependencies = ["bs4"]
 readme = "README.md"
 
 [project.scripts]
-getLinks = "getLinkTables:getTables"
-getTables = "getLinkTables:getLinks"
+getLinks = "getLinkTables:getLinks"
+getTables = "getLinkTables:getTables"
