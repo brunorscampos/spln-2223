@@ -1,6 +1,7 @@
 #!/usr/bin/env python3 
 from bs4 import BeautifulSoup as bs
 import requests
+import sys
 
 # 1) buscar tabelas
 # 2) fazer script getLinks para buscar links (a com href) escreva para fora o link e o texto associado
@@ -22,3 +23,13 @@ def getTables(url,goal):
             celulas = [x.text for x in linha.find_all('td')]
             linha_txt = "::".join(celulas)
             print(linha_txt)
+            
+if __name__ == "__main__":
+    if len(sys.argv)>1:
+        url = sys.argv[1]
+        if len(sys.argv)>2: goal = int(sys.argv[2])
+        else: goal = 0
+        getTables(url,goal)
+    else:
+        print("Usage: python3 a.py <url>")
+        sys.exit()
