@@ -10,8 +10,8 @@
 __version__ = "0.1"
 
 import argparse
-from .getLinks import getLinks
-from .getTables import getTables
+from get_links import get_links
+from get_tables import get_tables
 
 def get_arguments_links(__version__):
     parser = argparse.ArgumentParser(
@@ -43,7 +43,7 @@ def get_arguments_tables(__version__):
 def getLinks():
     args = get_arguments_links(__version__)
     url = args.url
-    getLinks(url)
+    get_links(url)
 
 def getTables():
     args = get_arguments_tables(__version__)
@@ -51,4 +51,4 @@ def getTables():
     goal = 0
     if args.goal:
         goal = int(args.goal)
-    getTables(url,goal)
+    get_tables(url,goal)

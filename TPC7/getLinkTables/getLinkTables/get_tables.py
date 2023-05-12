@@ -8,7 +8,7 @@ import sys
 # para todos os links com 'category=???' | grep 'category='
 # for a in $(getLinks <url> | grep 'category='): do getTables $a; done
 
-def getTables(url,goal):
+def get_tables(url,goal):
     conteudo = requests.get(url).text
     doc_tree = bs(conteudo,'lxml')
     tabelas = doc_tree.find_all('table')
@@ -29,7 +29,7 @@ if __name__ == "__main__":
         url = sys.argv[1]
         if len(sys.argv)>2: goal = int(sys.argv[2])
         else: goal = 0
-        getTables(url,goal)
+        get_tables(url,goal)
     else:
         print("Usage: python3 a.py <url>")
         sys.exit()
