@@ -1,7 +1,7 @@
 #!/usr/bin/env python3 
-from interpreter import MyInterpreter
-from myparser import myparser
-from utils import read_code
+from .interpreter import MyInterpreter
+from .myparser import myparser
+from .utils import read_code
 import sys
 
 def main_mkfstree(filename):

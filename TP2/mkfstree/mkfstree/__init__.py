@@ -30,6 +30,7 @@ def get_arguments_mktemplateskel(__version__):
                       mktemplateskel v{__version__}
     --------------------------------------------------------------------'''
     )
+    parser.add_argument('directory')
     parser.add_argument('--version','-V', action='version', version='%(prog)s '+__version__)
     return parser.parse_args()
 
@@ -40,4 +41,5 @@ def mkfstree():
 
 def mktemplateskel():
     args = get_arguments_mktemplateskel(__version__)
-    main_mktemplateskel()
+    directory = args.directory
+    main_mktemplateskel(directory)
