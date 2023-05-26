@@ -3,12 +3,11 @@ from lark import Token,Tree,Discard
 from lark.visitors import Interpreter
 
 class MyInterpreter(Interpreter):
-      
     def start(self,start):
-        # start: meta tree rest*
+        # start: meta tree
         self.dic = {}
         self.dic["vars"] = {}
-        self.dic["rest"] = []
+        self.dic["structure"] = []
         for random in start.children:
             self.visit(random)
         return self.dic
@@ -69,25 +68,6 @@ class MyInterpreter(Interpreter):
         for element in directory.children[1:]:
             elements.append(self.visit(element))
         return name, elements
-    
-    def rest(self,rest):
-        # rest: "===" file content
-        file = self.visit(rest.children[0])
-        content = self.visit(rest.children[1])
-        self.dic["rest"].append((file,content))
-    
-    def content(self,content):
-        # content: line+
-        lines = ""
-        for line in content.children:
-            lines += self.visit(line)
-        return lines
-    
-    def line(self,line):
-        # line: TEXT NEWLINE 
-        if len(line.children)<1:
-            return ""
-        return line.children[0].value + "\n"
         
     def identificador(self,identificador):
         # !identificador: "{{" ID "}}" | ID

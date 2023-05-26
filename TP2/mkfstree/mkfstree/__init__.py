@@ -2,7 +2,7 @@
 #!/usr/bin/env python3 
 """Module template multi-file."""
 
-__version__ = "0.1"
+__version__ = "0.2"
 
 import argparse
 from .mkfstree import main_mkfstree

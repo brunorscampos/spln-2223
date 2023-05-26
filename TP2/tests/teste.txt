@@ -39,7 +39,7 @@ readme = "{{name}}.md"
 """ FIXME: docstring """
 __version__ = "0.1.0"
 
-=== _test-1.py
+=== test-1.py
 import pytest
 import {{name}} 
 

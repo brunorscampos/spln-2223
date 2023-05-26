@@ -2,7 +2,7 @@
 from lark import Lark
 
 grammar = r'''
-start: meta tree rest*
+start: meta tree
 
 meta: "===" "meta" config
 config: name author var*
@@ -16,12 +16,6 @@ element: file
        | directory
 file: identificador "." identificador
 directory: identificador "/" ( "-" element)*
-
-rest: "===" file content
-content: line+
-line: TEXT NEWLINE 
-TEXT: /[^=\r\n][^\r\n]+/
-NEWLINE: /[\r]?[\n]/
 
 !identificador: "{{" ID "}}"
               | ID
