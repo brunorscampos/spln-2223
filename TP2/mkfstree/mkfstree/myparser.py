@@ -6,16 +6,16 @@ start: meta tree
 
 meta: "===" "meta" config
 config: name author var*
-name: "name:" ID
-author: "author:" ID
-var: ID ":" ID
+name: "name" ":" ID?
+author: "author" ":" ID?
+var: ID ":" ID?
 
 tree: "===" "tree" structure
 structure: element*
 element: file
        | directory
 file: identificador "." identificador
-directory: identificador "/" ( "-" element)*
+directory: identificador "/" ("-" element)*
 
 !identificador: "{{" ID "}}"
               | ID

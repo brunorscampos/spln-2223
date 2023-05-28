@@ -1,3 +1,4 @@
+#!/usr/bin/env python3 
 import os
 
 def build_fstree(structure, rest, parent_path=''):

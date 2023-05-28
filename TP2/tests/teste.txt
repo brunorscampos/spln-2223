@@ -9,6 +9,8 @@ pyproject.toml
   - __init__.py
   - {{name}}.md
 exemplo/
+  - ola/
+    - adeus.txt
 README.md
 tests/
   - test-1.py

@@ -2,7 +2,7 @@
 #!/usr/bin/env python3 
 """Module template multi-file."""
 
-__version__ = "0.2"
+__version__ = "0.5"
 
 import argparse
 from .mkfstree import main_mkfstree
@@ -30,8 +30,12 @@ def get_arguments_mktemplateskel(__version__):
                       mktemplateskel v{__version__}
     --------------------------------------------------------------------'''
     )
-    parser.add_argument('directory')
-    parser.add_argument('--version','-V', action='version', version='%(prog)s '+__version__)
+    parser.add_argument('directory', help="Root directory")
+    parser.add_argument("-n", "--name", help="Project name")
+    parser.add_argument("-a", "--author", help="Project author")
+    parser.add_argument('-c', '--content', action='store_true', help='Specify if file contents should be included')
+    parser.add_argument('-V', '--version', action='version', version='%(prog)s '+__version__)
+    parser.add_argument('-o', '--output')
     return parser.parse_args()
 
 def mkfstree():
@@ -41,5 +45,5 @@ def mkfstree():
 
 def mktemplateskel():
     args = get_arguments_mktemplateskel(__version__)
-    directory = args.directory
-    main_mktemplateskel(directory)
+    print(args)
+    main_mktemplateskel(args)

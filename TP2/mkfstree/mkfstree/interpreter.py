@@ -23,21 +23,27 @@ class MyInterpreter(Interpreter):
             self.dic["vars"][nome] = value
     
     def name(self,name):
-        # name: "name:" ID
+        # name: "name:" ID?
         nome = "name"
-        value = name.children[0].value
+        if len(name.children):
+            value = name.children[0].value
+        else: value = ""
         return nome, value
     
     def author(self,author):
-        # author: "author:" ID
+        # author: "author:" ID?
         nome = "author"
-        value = author.children[0].value
+        if len(author.children):
+            value = author.children[0].value
+        else: value = ""
         return nome, value
     
     def var(self,var):
-        # var: ID ":" ID
+        # var: ID ":" ID?
         nome = var.children[0].value
-        value = var.children[1].value
+        if len(var.children):
+            value = var.children[1].value
+        else: value = ""
         return nome, value
     
     def tree(self,tree):
@@ -57,16 +63,19 @@ class MyInterpreter(Interpreter):
     
     def file(self,file):
         # file: identificador "." identificador
-        name = self.visit(file.children[0])
-        extension = self.visit(file.children[1])
-        return name + "." + extension
+        res = ""
+        res += self.visit(file.children[0])
+        if len(file.children)>1:
+            res += "." + self.visit(file.children[1])
+        return res
     
     def directory(self,directory):
-        # directory: identificador "/" ( "-" element)*
+        # directory: identificador "/" ("-" element)*
         name = self.visit(directory.children[0])
         elements = []
         for element in directory.children[1:]:
-            elements.append(self.visit(element))
+            if type(element) == Tree:
+                elements.append(self.visit(element))
         return name, elements
         
     def identificador(self,identificador):
