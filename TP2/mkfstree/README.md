@@ -3,10 +3,15 @@
 
 Este trabalho consiste ...
 
-## Uso : dado um template gerar árvore do projecto
+## Usage: 
+######  mkfstree [-h] [-n NAME] [-a AUTHOR] [--version] template_file
 
-    mkfstree -v name=mytool templateflit
+    positional arguments:
+        template_file
 
-## Ferramenta complementar: dado uma árvore exemplo, gerar template
-
-    mktemplateskel -v name=myproj module_myproj/   > template
+    optional arguments:
+        -h, --help            show this help message and exit
+        -n NAME, --name NAME  Project name
+        -a AUTHOR, --author AUTHOR
+                                Project author
+        --version, -V         show program's version number and exit

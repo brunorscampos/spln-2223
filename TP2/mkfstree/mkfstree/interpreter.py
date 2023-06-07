@@ -3,11 +3,18 @@ from lark import Token,Tree,Discard
 from lark.visitors import Interpreter
 
 class MyInterpreter(Interpreter):
-    def start(self,start):
-        # start: meta tree
+    def __init__(self,name,author) -> None:
+        super().__init__()
         self.dic = {}
         self.dic["vars"] = {}
         self.dic["structure"] = []
+        if name: 
+            self.dic["vars"]["name"] = name
+        if author: 
+            self.dic["vars"]["author"] = author
+        
+    def start(self,start):
+        # start: meta tree
         for random in start.children:
             self.visit(random)
         return self.dic
@@ -20,7 +27,8 @@ class MyInterpreter(Interpreter):
         # config: name author var*
         for var in config.children:
             nome, value = self.visit(var)
-            self.dic["vars"][nome] = value
+            if nome not in self.dic["vars"]: 
+                self.dic["vars"][nome] = value
     
     def name(self,name):
         # name: "name:" ID?
@@ -62,7 +70,7 @@ class MyInterpreter(Interpreter):
         return self.visit(element.children[0])
     
     def file(self,file):
-        # file: identificador "." identificador
+        # file: identificador ("." identificador)? ";"
         res = ""
         res += self.visit(file.children[0])
         if len(file.children)>1:

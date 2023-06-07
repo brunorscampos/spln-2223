@@ -14,7 +14,7 @@ tree: "===" "tree" structure
 structure: element*
 element: file
        | directory
-file: identificador "." identificador
+file: identificador ("." identificador)? ";"
 directory: identificador "/" ("-" element)*
 
 !identificador: "{{" ID "}}"

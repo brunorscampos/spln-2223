@@ -5,12 +5,15 @@ from .build_fstree import build_fstree
 from .utils import read_code, process_rest
 import sys
 
-def main_mkfstree(filename):
+def main_mkfstree(args):
+    filename = args.filename
+    name = args.name
+    author = args.author
     input_code = read_code(filename)
     split_text = input_code.split('===')
     tree = ''.join(['===' + x for x in split_text[1:3]])
     parse_tree = myparser.parse(tree)
-    data = MyInterpreter().visit(parse_tree)
+    data = MyInterpreter(name,author).visit(parse_tree)
     
     contents = ['===' + x for x in split_text[3:]]
     rest = process_rest(contents,data["vars"])

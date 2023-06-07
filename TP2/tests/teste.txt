@@ -4,16 +4,17 @@ author: JJoao     // provided or default
 
 === tree
 
-pyproject.toml
+pyproject.toml;
 {{name}}/
-  - __init__.py
-  - {{name}}.md
+  - __init__.py;
+  - {{name}}.md;
+  - {{name}};
 exemplo/
   - ola/
-    - adeus.txt
-README.md
+    - adeus.txt;
+README.md;
 tests/
-  - test-1.py
+  - test-1.py;
 
 === pyproject.toml
 [build-system]
