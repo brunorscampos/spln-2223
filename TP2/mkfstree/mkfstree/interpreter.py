@@ -1,5 +1,5 @@
 #!/usr/bin/env python3 
-from lark import Token,Tree,Discard
+from lark import Tree
 from lark.visitors import Interpreter
 
 class MyInterpreter(Interpreter):

@@ -3,13 +3,12 @@ from .interpreter import MyInterpreter
 from .myparser import myparser
 from .build_fstree import build_fstree
 from .utils import read_code, process_rest
-import sys
 
 def main_mkfstree(args):
-    filename = args.filename
+    template_file = args.template_file
     name = args.name
     author = args.author
-    input_code = read_code(filename)
+    input_code = read_code(template_file)
     split_text = input_code.split('===')
     tree = ''.join(['===' + x for x in split_text[1:3]])
     parse_tree = myparser.parse(tree)
@@ -18,16 +17,4 @@ def main_mkfstree(args):
     contents = ['===' + x for x in split_text[3:]]
     rest = process_rest(contents,data["vars"])
     
-    print("======================================   TREE   ==============================================")
-    for k in data:
-        print(k,data[k])
-    
     build_fstree(data["structure"], rest)
-    
-if __name__ == "__main__":
-    if len(sys.argv) == 2:
-        filename = sys.argv[1]
-    else:
-        print("Use: python3 mkfstree.py <filename>")
-        sys.exit()
-    main_mkfstree(filename)
