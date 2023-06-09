@@ -1,22 +1,23 @@
-=== meta
-name: gamer       // provided or ask
-author: JJoao     // provided or default
+=== meta                        // declaration of name and author are mandatory (but can be left empty)
+name: teste
+author: JJoao
+// ... declare desired variables here
 
-=== tree
+=== tree                        // desired structure of the directory tree
 
 pyproject.toml;
-{{name}}/
+{{name}}/                       // replaced with variable value 
   - __init__.py;
   - {{name}}.md;
-  - {{name}};
+  - {{name}};                   // '-' to declare files or dictories inside a directory
 exemplo/
-  - ola/
+  - aninhado/
     - adeus.txt;
 README.md;
-tests/
-  - test-1.py;
+tests/                          // directories end with '/'
+  - test-1.py;                  // files end in ';'
 
-=== pyproject.toml
+=== pyproject.toml              // declare file contents (not mandatory)
 [build-system]
 requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
