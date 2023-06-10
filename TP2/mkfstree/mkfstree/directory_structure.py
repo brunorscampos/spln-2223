@@ -23,8 +23,11 @@ def directory_structure(root_dir,content):
             for file_name in file_names:
                 file_path = os.path.join(dir_name, file_name)
                 with open(file_path, 'r') as file:
-                    file_content = file.read()
-                    rest.append((file_name, file_content))
+                    try:
+                        file_content = file.read()
+                        rest.append((file_name, file_content))
+                    except:
+                        print("Skipping non-text file '%s'" % file_name)
     return result, rest
     
 def build_tree(structure, indent=0):
